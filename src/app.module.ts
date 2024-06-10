@@ -35,10 +35,10 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     MongooseModule.forRootAsync({
       useClass: MongoConfigService,
     }),
-    SequelizeModule.forRootAsync({
-      name: 'high-level',
-      useClass: DatabaseConfigService,
-    }),
+    // SequelizeModule.forRootAsync({
+    //   name: 'high-level',
+    //   useClass: DatabaseConfigService,
+    // }),
 
     I18nModule.forRootAsync({
       imports: undefined,
