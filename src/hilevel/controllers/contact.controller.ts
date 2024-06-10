@@ -10,10 +10,19 @@ import {
   UseInterceptors,
   UploadedFiles,
   BadRequestException,
+  Get,
+  Param,
+  Query,
 } from '@nestjs/common';
 import { ContactService } from '../services/contact.service';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { CreateBulkContactDto, CreateContactDto } from '../dto/contact.dto';
+import {
+  CreateBulkContactDto,
+  CreateContactDto,
+  FindAllDto,
+  FindOneDto,
+  FindOneWithLimit,
+} from '../dto/contact.dto';
 import { Response } from 'src/common/dto/response.dto';
 import { ResponseService } from 'src/common/service/response/response.services';
 import {
@@ -23,6 +32,7 @@ import {
 import { HeaderDto } from '../../common/dto/header.dto';
 import { TranslateService } from '../../common/service/response/translate.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { AnalyticsService } from '../services/analytics.service';
 
 const allowedMimeTypes = ['text/csv'];
 
@@ -31,6 +41,8 @@ const allowedMimeTypes = ['text/csv'];
 export class ContactController {
   constructor(
     private readonly contactService: ContactService,
+    private readonly analyticsService: AnalyticsService,
+
     private responseService: ResponseService,
     private readonly translate: TranslateService,
   ) {}
@@ -100,6 +112,119 @@ export class ContactController {
         msg: this.translate.t('msg.success'),
         data: {
           requestIds: responses,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: this.translate.t('msg.wentWrong'),
+          message: (error as Error).message,
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get('/get-request-status/:request_id')
+  @VersionParam()
+  @HeaderParam()
+  async getStatus(@Param() params: FindOneDto): Promise<Response> {
+    try {
+      const responses = await this.analyticsService.getStatusByRequestID(
+        params.request_id,
+      );
+      if (!responses) {
+        throw new BadRequestException('No Record found');
+      }
+      return this.responseService.onSuccess({
+        code: HttpStatus.CREATED,
+        msg: this.translate.t('msg.success'),
+        data: {
+          responses,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: this.translate.t('msg.wentWrong'),
+          message: (error as Error).message,
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get('/get-all-requests/')
+  @VersionParam()
+  @HeaderParam()
+  async getAllRequest(): Promise<Response> {
+    try {
+      const responses = await this.analyticsService.getAllRequest();
+      return this.responseService.onSuccess({
+        code: HttpStatus.CREATED,
+        msg: this.translate.t('msg.success'),
+        data: {
+          responses,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: this.translate.t('msg.wentWrong'),
+          message: (error as Error).message,
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get('/get-entity-status/:request_id')
+  @VersionParam()
+  @HeaderParam()
+  async getAllEntity(@Query() query: FindOneWithLimit): Promise<Response> {
+    try {
+      const responses =
+        await this.analyticsService.getEntityStatusByRequestID(query);
+      if (!responses) {
+        throw new BadRequestException('No Record found');
+      }
+      return this.responseService.onSuccess({
+        code: HttpStatus.CREATED,
+        msg: this.translate.t('msg.success'),
+        data: {
+          responses,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: this.translate.t('msg.wentWrong'),
+          message: (error as Error).message,
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get('/get-all-entity')
+  @VersionParam()
+  @HeaderParam()
+  async getEntity(@Query() query: FindAllDto): Promise<Response> {
+    try {
+      const responses = await this.analyticsService.getEntity(query);
+      return this.responseService.onSuccess({
+        code: HttpStatus.CREATED,
+        msg: this.translate.t('msg.success'),
+        data: {
+          responses,
         },
       });
     } catch (error) {

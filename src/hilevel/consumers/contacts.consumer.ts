@@ -4,10 +4,7 @@ import { ContactService } from '../services/contact.service';
 
 @Processor('contacts')
 export class ContactConsumer {
-  constructor(
-    private readonly contactService: ContactService,
-  ) {}
-
+  constructor(private readonly contactService: ContactService) {}
 
   @Process()
   async transcode(job: Job<unknown>) {

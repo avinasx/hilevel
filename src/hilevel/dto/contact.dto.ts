@@ -1,8 +1,13 @@
 import { IsEmail, IsNotEmpty, IsNumber, IsNumberString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, Type } from "class-transformer";
+import { Type } from 'class-transformer';
+import { ProgressStatusEnum } from '../enums/status.enum';
 
 export class CreateContactDto {
+  @IsNotEmpty()
+  @ApiProperty()
+  user_id: number;
+
   @IsNotEmpty()
   @ApiProperty()
   name: string;
@@ -15,9 +20,40 @@ export class CreateContactDto {
   age: number;
 }
 
-export class FindOneContactDto {
-  @IsNumberString()
-  id: number;
+export class FindOneDto {
+  @ApiProperty()
+  request_id: number;
+}
+
+export class FindOneWithLimit {
+  @ApiProperty()
+  request_id: number;
+
+  @ApiProperty({ enum: ProgressStatusEnum })
+  @IsNotEmpty()
+  status: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  limit: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  offset: number;
+}
+
+export class FindAllDto {
+  @ApiProperty({ enum: ProgressStatusEnum })
+  @IsNotEmpty()
+  status: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  limit: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  offset: number;
 }
 
 export class CreateBulkContactDto {

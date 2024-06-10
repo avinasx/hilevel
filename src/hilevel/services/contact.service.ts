@@ -85,7 +85,6 @@ export class ContactService {
       const csvData = response.data;
       const lineCount = csvData.split('\n').length;
 
-
       // Parse the CSV data
       let rowCount = 0;
       let header = [];
@@ -110,7 +109,11 @@ export class ContactService {
                 this.requestLogRepository
                   .updateOne(
                     { request_id: jobId },
-                    { progressPercentage: (rowCount / (lineCount - 1)) * 100 },
+                    {
+                      progressPercentage: Math.round(
+                        (rowCount / (lineCount - 1)) * 100,
+                      ),
+                    },
                   )
                   .then(() => {
                     console.log('job is in progress');

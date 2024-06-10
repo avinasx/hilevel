@@ -15,8 +15,18 @@ export class EntityLogsRepository {
     return created.save();
   }
 
-  async findAll(): Promise<EntityLogModel[]> {
-    return this.entityLogModel.find().exec();
+  async findAllByRequestId(obj: any): Promise<EntityLogModel[]> {
+    return this.entityLogModel
+      .find({ request_id: obj.request_id, status: obj.status })
+      .skip(obj.offset)
+      .limit(obj.limit);
+  }
+
+  async findAll(obj: any): Promise<EntityLogModel[]> {
+    return this.entityLogModel
+      .find({ status: obj.status })
+      .skip(obj.offset)
+      .limit(obj.limit);
   }
 
   async findOne(): Promise<EntityLogModel> {

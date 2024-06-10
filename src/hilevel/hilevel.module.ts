@@ -13,6 +13,7 @@ import { EntityLogModel, EntityLogSchema } from './models/entity.logs.model';
 import { ContactConsumer } from './consumers/contacts.consumer';
 import { RequestLogRepository } from './repository/request.log.repository';
 import { EntityLogsRepository } from './repository/entity.logs.repository';
+import { AnalyticsService } from './services/analytics.service';
 
 @Module({
   imports: [
@@ -20,6 +21,8 @@ import { EntityLogsRepository } from './repository/entity.logs.repository';
       {
         name: ContactModel.name,
         useFactory: () => {
+          const schema = ContactSchema;
+          schema.plugin(require('mongoose-unique-validator'));
           return ContactSchema;
         },
       },
@@ -44,6 +47,7 @@ import { EntityLogsRepository } from './repository/entity.logs.repository';
   controllers: [ContactController],
   providers: [
     ContactService,
+    AnalyticsService,
     ContactRepository,
     RequestLogRepository,
     EntityLogsRepository,

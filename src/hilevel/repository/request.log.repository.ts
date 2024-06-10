@@ -19,8 +19,8 @@ export class RequestLogRepository {
     return this.requestLogModel.find().exec();
   }
 
-  async findOne(): Promise<RequestLogModel> {
-    return this.requestLogModel.findOne().exec();
+  async findOne(request_id: number): Promise<RequestLogModel> {
+    return this.requestLogModel.findOne({ request_id: request_id });
   }
 
   async update(cond: any, param: any): Promise<any> {
