@@ -95,8 +95,8 @@ export class ContactService {
             header = row;
           } else {
             const obj = {};
-            for (let i: number = 0; i < row.length; i++) {
-              obj[header[i]] = row[i];
+            for (let i: number = 0; i < header.length; i++) {
+              obj[header[i]] = row[i] ?? '';
             }
             this.contactRepository
               .createRaw(obj)

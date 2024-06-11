@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { UserStatusEnum } from '../enums/status.enum';
+import { isEmail } from 'validator';
 
 export type ContactDocument = HydratedDocument<ContactModel>;
 
@@ -20,7 +21,7 @@ export class ContactModel {
   @Prop()
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, validate: [isEmail, 'invalid email'] })
   email: string;
 
   @Prop()

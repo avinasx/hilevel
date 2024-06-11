@@ -6,6 +6,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { WinstonModule } from 'nest-winston';
 import { loggerOption } from './config/logger.config';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import * as process from 'node:process';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -32,7 +33,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT, '0.0.0.0');
 }
 bootstrap().then(() => {
   console.log('Server is running');
