@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { UserStatusEnum } from '../enums/status.enum';
 import { isEmail } from 'validator';
 
 export type ContactDocument = HydratedDocument<ContactModel>;
@@ -26,9 +25,6 @@ export class ContactModel {
 
   @Prop()
   age: number;
-
-  @Prop({ type: String, default: UserStatusEnum.ACTIVE })
-  status: UserStatusEnum;
 }
 
 export const ContactSchema = SchemaFactory.createForClass(ContactModel);
