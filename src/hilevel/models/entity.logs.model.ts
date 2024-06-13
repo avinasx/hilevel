@@ -20,7 +20,7 @@ export class EntityLogModel {
   @Prop()
   entities?: SchemaMongoose.Types.Mixed;
 
-  @Prop({ type: String, default: ProgressStatusEnum.QUEUED })
+  @Prop({ type: String, default: ProgressStatusEnum.IN_PROGRESS })
   status?: ProgressStatusEnum;
 
   @Prop()

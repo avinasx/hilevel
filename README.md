@@ -66,18 +66,14 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 - Author - [Avinash](https://avinasx.github.io)
 
-
-
 ## License
 
 Nest is [MIT licensed](LICENSE).
 
-
 # To test
+
 `git pull`
 
 Add .env file (contact me)!
 
 `npm run start:dev`
-
-

@@ -16,11 +16,8 @@ export class ContactRepository {
   }
 
   async createRaw(createContactDto: any): Promise<ContactModel> {
-    return this.contactModel.findOneAndUpdate(
-      { user_id: createContactDto['user_id'] },
-      createContactDto,
-      { upsert: true },
-    );
+    const createdContact = new this.contactModel(createContactDto);
+    return createdContact.save();
   }
 
   async createBulk(

@@ -4,6 +4,7 @@ export enum ProgressStatusEnum {
   IN_PROGRESS = 'IN_PROGRESS',
   FAILED = 'FAILED',
   DONE = 'DONE',
+  SKIPPED = 'SKIPPED',
 }
 
 export enum UserStatusEnum {

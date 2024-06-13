@@ -71,7 +71,7 @@ export class ContactService {
     const csvUrl = job.data.url;
     const jobId = parseInt(job.id.toString());
 
-    this.requestLogRepository
+    await this.requestLogRepository
       .updateOne(
         { request_id: jobId },
         { status: ProgressStatusEnum.IN_PROGRESS },
@@ -89,7 +89,7 @@ export class ContactService {
       let rowCount = 0;
       let header = [];
       parse(csvData, { skipRecordsWithError: true })
-        .on('data', (row: any) => {
+        .on('data', async (row: any) => {
           rowCount = rowCount + 1;
           if (rowCount == 1) {
             header = row;
@@ -98,51 +98,43 @@ export class ContactService {
             for (let i: number = 0; i < header.length; i++) {
               obj[header[i]] = row[i] ?? '';
             }
-            this.contactRepository
-              .createRaw(obj)
-              .then(async () => {
-                await this.entityLogsRepository.create({
-                  request_id: jobId,
-                  entity: obj,
-                  status: ProgressStatusEnum.DONE,
-                });
-                this.requestLogRepository
-                  .updateOne(
-                    { request_id: jobId },
-                    {
-                      progressPercentage: Math.round(
-                        (rowCount / (lineCount - 1)) * 100,
-                      ),
-                    },
-                  )
-                  .then(() => {
-                    console.log('job is in progress');
-                  });
-              })
-              .catch(async (err) => {
-                await this.entityLogsRepository.create({
-                  request_id: jobId,
-                  entities: obj,
-                  status: ProgressStatusEnum.FAILED,
-                  remark: err.toString(),
-                });
+
+            try {
+              await this.contactRepository.createRaw(obj);
+              await this.entityLogsRepository.create({
+                request_id: jobId,
+                entity: obj,
+                status: ProgressStatusEnum.DONE,
               });
+
+              await this.requestLogRepository
+                .updateOne(
+                  { request_id: jobId },
+                  {
+                    progressPercentage: Math.round(
+                      (rowCount / (lineCount - 1)) * 100,
+                    ),
+                  },
+                )
+                .then(() => {
+                  console.log('job is in progress');
+                });
+            } catch (err) {
+              await this.entityLogsRepository.create({
+                request_id: jobId,
+                entities: obj,
+                status: ProgressStatusEnum.SKIPPED,
+                remark: err.toString(),
+              });
+            }
           }
         })
-        .on('end', () => {
+        .on('end', async () => {
           console.log('CSV file successfully processed');
           job.progress(1);
-          this.requestLogRepository
-            .updateOne(
-              { request_id: jobId },
-              { status: ProgressStatusEnum.DONE },
-            )
-            .then(() => {
-              console.log('job is in progress');
-            });
         })
-        .on('error', (err: any) => {
-          this.requestLogRepository
+        .on('error', async (err: any) => {
+          await this.requestLogRepository
             .updateOne(
               { request_id: jobId },
               {
@@ -155,7 +147,7 @@ export class ContactService {
             });
         });
     } catch (err) {
-      this.requestLogRepository
+      await this.requestLogRepository
         .updateOne(
           { request_id: jobId },
           {
@@ -165,6 +157,12 @@ export class ContactService {
         )
         .then(() => {
           console.log('job is failed');
+        });
+    } finally {
+      await this.requestLogRepository
+        .updateOne({ request_id: jobId }, { status: ProgressStatusEnum.DONE })
+        .then(() => {
+          console.log('job is done');
         });
     }
 
