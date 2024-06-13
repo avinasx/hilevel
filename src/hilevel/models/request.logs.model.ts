@@ -17,7 +17,7 @@ export class RequestLogModel {
   @Prop()
   request_id: number;
 
-  @Prop()
+  @Prop({ default: 0 })
   progressPercentage?: number;
 
   @Prop({ type: String, default: ProgressStatusEnum.QUEUED })

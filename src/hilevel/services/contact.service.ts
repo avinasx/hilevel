@@ -106,19 +106,6 @@ export class ContactService {
                 entity: obj,
                 status: ProgressStatusEnum.DONE,
               });
-
-              await this.requestLogRepository
-                .updateOne(
-                  { request_id: jobId },
-                  {
-                    progressPercentage: Math.round(
-                      (rowCount / (lineCount - 1)) * 100,
-                    ),
-                  },
-                )
-                .then(() => {
-                  console.log('job is in progress');
-                });
             } catch (err) {
               await this.entityLogsRepository.create({
                 request_id: jobId,
@@ -126,12 +113,22 @@ export class ContactService {
                 status: ProgressStatusEnum.SKIPPED,
                 remark: err.toString(),
               });
+            } finally {
+              await this.requestLogRepository.updateOne(
+                { request_id: jobId },
+                {
+                  progressPercentage: Math.round(
+                    (rowCount / (lineCount - 1)) * 100,
+                  ),
+                },
+              );
+              console.log('*******************');
             }
           }
         })
         .on('end', async () => {
           console.log('CSV file successfully processed');
-          job.progress(1);
+          await job.progress(1);
         })
         .on('error', async (err: any) => {
           await this.requestLogRepository
