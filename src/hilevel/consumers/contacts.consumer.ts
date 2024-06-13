@@ -6,7 +6,7 @@ import { ContactService } from '../services/contact.service';
 export class ContactConsumer {
   constructor(private readonly contactService: ContactService) {}
 
-  @Process()
+  @Process({ concurrency: 5 })
   async transcode(job: Job<unknown>) {
     this.contactService.readCsv(job).then();
     return {};
